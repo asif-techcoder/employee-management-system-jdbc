@@ -109,6 +109,85 @@ public class EmployeeDAO {
 
         } catch (Exception e) {
             e.printStackTrace();
+
+        }
+
+    }
+    public static boolean employeeExists(int empId) {
+
+        String sql = "SELECT 1 FROM employee WHERE emp_id = ?";
+
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, empId);
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next(); // true if employee exists
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }public static void getEmployeeById(int empId) {
+
+        String sql = """
+            SELECT e.emp_id, e.first_name, e.email,
+                   d.dept_name, r.role_name, e.salary
+            FROM employee e
+            JOIN department d ON e.dept_id = d.dept_id
+            JOIN role r ON e.role_id = r.role_id
+            WHERE e.emp_id = ?
+            """;
+
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, empId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("ID    : " + rs.getInt("emp_id"));
+                System.out.println("Name  : " + rs.getString("first_name"));
+                System.out.println("Email : " + rs.getString("email"));
+                System.out.println("Dept  : " + rs.getString("dept_name"));
+                System.out.println("Role  : " + rs.getString("role_name"));
+                System.out.println("Salary: " + rs.getDouble("salary"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }public static void getEmployeesPaged(int limit, int offset) {
+        String sql = """
+        SELECT e.emp_id, e.first_name, e.email,
+               d.dept_name, r.role_name, e.salary
+        FROM employee e
+        JOIN department d ON e.dept_id = d.dept_id
+        JOIN role r ON e.role_id = r.role_id
+        LIMIT ? OFFSET ?
+        """;
+
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                System.out.println(
+                        rs.getInt("emp_id") + " | " +
+                                rs.getString("first_name") + " | " +
+                                rs.getString("email") + " | " +
+                                rs.getString("dept_name") + " | " +
+                                rs.getString("role_name") + " | " +
+                                rs.getDouble("salary")
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
 }

@@ -1,5 +1,7 @@
 package jdbc;
 
+import jdbc.EmployeeService;
+import exception.EmployeeNotFoundException;
 import java.util.Scanner;
 
 public class MainApp {
@@ -18,7 +20,9 @@ public class MainApp {
             System.out.println("2. View Employees");
             System.out.println("3. Update Salary");
             System.out.println("4. Delete Employee");
-            System.out.println("5. Exit");
+            System.out.println("5. Search Employee by ID");
+            System.out.println("6. View Employees(Paged)");
+            System.out.println("7. Exit");
             System.out.print("Choose an option: ");
 
             int choice = sc.nextInt();
@@ -52,13 +56,13 @@ public class MainApp {
                         break;
                     }
 
-                    EmployeeDAO.addEmployee(
+                    EmployeeService.addEmployee(
                             name, email, deptId, roleId, salary
                     );
                     break;
 
                 case 2:
-                    EmployeeDAO.getAllEmployees();
+                    EmployeeService.viewAllEmployees();
                     break;
 
                 case 3:
@@ -68,17 +72,51 @@ public class MainApp {
                     System.out.print("New Salary: ");
                     double newSalary = sc.nextDouble();
 
-                    EmployeeDAO.updateSalary(empId, newSalary);
+                    try {
+                        EmployeeService.updateSalary(empId, newSalary);
+                    }
+                    catch (EmployeeNotFoundException e){
+                        System.out.println("❌" + e.getMessage());
+                    }
                     break;
 
                 case 4:
                     System.out.print("Employee ID: ");
                     int delId = sc.nextInt();
 
-                    EmployeeDAO.deleteEmployee(delId);
+                    try {
+                        EmployeeService.deleteEmployee(delId);
+                    }
+                    catch (EmployeeNotFoundException e){
+                        System.out.println("❌" + e.getMessage());
+                    }
                     break;
 
                 case 5:
+                    System.out.println("Employee ID: ");
+                    int searchID = sc.nextInt();
+
+                    try {
+                        EmployeeService.searchEmployeeById(searchID);
+                    }
+                    catch (EmployeeNotFoundException e){
+                        System.out.println("❌" + e.getMessage());
+                    }
+                    break;
+
+
+
+                case 6:
+                    System.out.println("Page number: ");
+                    int page = sc.nextInt();
+
+                    System.out.println("Page size: ");
+                    int size = sc.nextInt();
+
+                    EmployeeService.viewEmployeesPaged(page,size);
+                    break;
+
+                case 7:
                     running = false;
                     System.out.println("👋 Exiting application");
                     break;
